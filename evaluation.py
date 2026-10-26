@@ -1,14 +1,4 @@
-"""
-===============================================================================
- Evaluation du Random Forest (from scratch) sur la base du diabete
-===============================================================================
- Entraine sur data/diabete_train.csv, teste sur data/diabete_test.csv et affiche
- la matrice de confusion et les metriques.
 
- Execution : python evaluation.py
-             python evaluation.py --arbres 50 --profondeur 6 --seed 1
-===============================================================================
-"""
 
 import argparse
 import time
