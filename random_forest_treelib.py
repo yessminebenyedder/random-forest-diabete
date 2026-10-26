@@ -147,10 +147,8 @@ class ArbreDecision:
         La convention est : valeur != None  <=>  le noeud est une feuille.
     """
 
-    def __init__(self, max_depth=None, n_features=None, rng=None, noms_features=None,
-                 verbose=False):
+    def __init__(self, n_features=None, rng=None, noms_features=None, verbose=False):
         self.verbose = verbose              # True : explique la construction pas a pas
-        self.max_depth = max_depth          # profondeur maximale (None = illimitee)
         self.n_features = n_features        # k : variables tirees par noeud (None = toutes)
         # Generateur aleatoire : fourni par la foret (partage) ou cree ici
         self.rng = rng if rng is not None else np.random.default_rng()
@@ -188,7 +186,7 @@ class ArbreDecision:
         """
         Construction RECURSIVE (parcours en profondeur, gauche d'abord).
 
-        1. Si le noeud est pur ou trop profond -> on cree une FEUILLE.
+        1. Si le noeud est PUR (Gini = 0 : une seule classe) -> on cree une FEUILLE.
         2. Sinon on tire k variables au hasard et on cherche la meilleure coupure.
         3. Si aucune coupure n'existe -> FEUILLE.
         4. Sinon on cree un NOEUD INTERNE, on separe les lignes et on
@@ -204,7 +202,6 @@ class ArbreDecision:
 
         # ---- Criteres d'arret ------------------------------------------------
         pur = len(set(y)) == 1
-        trop_profond = self.max_depth is not None and profondeur >= self.max_depth
         feature, seuil = None, None
         marge = "    " * profondeur                     # indentation des messages (mode detaille)
         if self.verbose:
@@ -212,9 +209,7 @@ class ArbreDecision:
                   f"classes {dict(Counter(y))}, Gini = {gini(y):.3f}")
             if pur:
                 print(f"{marge}  -> noeud PUR : on s'arrete")
-            elif trop_profond:
-                print(f"{marge}  -> profondeur maximale ({self.max_depth}) atteinte : on s'arrete")
-        if not pur and not trop_profond:
+        if not pur:
             p = len(X[0])
             k = p if self.n_features is None else min(self.n_features, p)
             # ETAPE 2 : k indices de variables tires SANS remise, a chaque noeud
@@ -331,10 +326,9 @@ class RandomForest:
     et leurs erreurs se compensent lors du vote.
     """
 
-    def __init__(self, n_arbres=10, max_depth=None, n_features=None, seed=None, verbose=False):
+    def __init__(self, n_arbres=10, n_features=None, seed=None, verbose=False):
         self.verbose = verbose          # True : affiche la construction de chaque arbre
         self.n_arbres = n_arbres        # B : nombre d'arbres
-        self.max_depth = max_depth      # transmis a chaque arbre
         self.n_features = n_features    # k (None -> racine de p, calcule dans fit)
         self.seed = seed                # graine : resultats reproductibles
         self.arbres = []                # liste des ArbreDecision entraines
@@ -370,7 +364,7 @@ class RandomForest:
                     print(f"  lignes tirees (numero de ligne, 1er = 0) : {[int(i) for i in idx]}")
                     print(f"  lignes jamais tirees                     : {absentes}")
                 print()
-            arbre = ArbreDecision(self.max_depth, k, rng, noms_features, verbose=self.verbose)
+            arbre = ArbreDecision(k, rng, noms_features, verbose=self.verbose)
             arbre.fit([X[i] for i in idx], [y[i] for i in idx])
             if self.verbose:
                 print(f"\nArbre {b + 1} obtenu :")

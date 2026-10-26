@@ -1,4 +1,14 @@
+"""
+===============================================================================
+ Evaluation du Random Forest (from scratch) sur la base du diabete
+===============================================================================
+ Entraine sur data/diabete_train.csv, teste sur data/diabete_test.csv et affiche
+ la matrice de confusion et les metriques.
 
+ Execution : python evaluation.py
+             python evaluation.py --arbres 50 --seed 1
+===============================================================================
+"""
 
 import argparse
 import time
@@ -31,7 +41,6 @@ def rapport(y_vrai, y_pred, titre):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--arbres", type=int, default=25)
-    parser.add_argument("--profondeur", type=int, default=None)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -41,7 +50,7 @@ def main():
     print(f"Test         : {len(X_t)} patientes, classes {dict(Counter(y_t))}")
 
     debut = time.time()
-    foret = RandomForest(n_arbres=args.arbres, max_depth=args.profondeur, seed=args.seed)
+    foret = RandomForest(n_arbres=args.arbres, seed=args.seed)
     foret.fit(X, y, noms_features=noms)
     print(f"\nForet de {args.arbres} arbres entrainee en {time.time() - debut:.1f} s")
 

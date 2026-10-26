@@ -9,7 +9,6 @@
 
  Le programme demande :
    1. le NOMBRE D'ARBRES      (choisi par l'utilisateur)
-   2. la profondeur maximale  (Entree = 3)
 
  Puis il :
    - construit la foret en AFFICHANT chaque arbre pas a pas
@@ -30,7 +29,6 @@ from random_forest_treelib import RandomForest
 from visualisation import generer_html
 
 FICHIER_HTML = DOSSIER.parent / "foret_resultat.html"   # page de visualisation
-PROFONDEUR_DEFAUT = 3
 
 
 # =============================================================================
@@ -136,12 +134,9 @@ def main():
         print(f"  {nom:<14} {DESCRIPTIONS[nom]}")
 
     n_arbres = demander_entier("\nNombre d'arbres de la foret : ", 1)
-    prof = demander_entier(f"Profondeur maximale (Entree = {PROFONDEUR_DEFAUT}) : ", 1,
-                           defaut=PROFONDEUR_DEFAUT)
-
-    print(f"\nConstruction de {n_arbres} arbre(s), profondeur max = {prof}, "
-          f"k = {max(1, int(len(noms) ** 0.5))} variable(s) tiree(s) par noeud.")
-    foret = RandomForest(n_arbres=n_arbres, max_depth=prof, verbose=True)
+    print(f"\nConstruction de {n_arbres} arbre(s), k = {max(1, int(len(noms) ** 0.5))} variable(s) tiree(s) par noeud.")
+    print("Chaque arbre grandit tout seul : il s'arrete quand ses groupes sont purs (Gini = 0).")
+    foret = RandomForest(n_arbres=n_arbres, verbose=True)
     foret.fit(X, y, noms_features=noms)
     print("\n" + "=" * 78)
     print(f" Foret terminee : {n_arbres} arbre(s) construit(s)")
